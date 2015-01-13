@@ -1,0 +1,241 @@
+<?php //echo $this->getLayout()->createBlock('emailnotify/adminhtml_emailnotify')->toHtml(); ?>
+<div class="entry-edit">
+    <div class="entry-edit-head">
+		<h4 class="icon-head head-edit-form fieldset-legend">
+			<?php echo $this->getTabTitle();?>
+		</h4>
+	</div>
+
+	<div class="fieldset fieldset-wide" id="group_fields8">
+		<div class="hor-scroll">	
+			<?php $current_product_id = $this->getRequest()->getParam('id'); ?>
+			<input type="hidden" name="current_product_id" id="current_product_id" value="<?php	echo $current_product_id; ?>" />
+			<input type="hidden" name="current_store_id" id="current_store_id" value="<?php	echo Mage::app()->getStore()->getStoreId(); ?>" />
+			
+			<input type="hidden" name="special_price_url_add" id="special_price_url_add" value="<?php echo $this->getUrl('specialprice/adminhtml_specialprice/addsplprice');?>" />
+			<input type="hidden" name="special_price_url_upt" id="special_price_url_upt" value="<?php echo $this->getUrl('specialprice/adminhtml_specialprice/uptsplprice');?>" />
+			<input type="hidden" name="special_price_url_sel" id="special_price_url_sel" value="<?php echo $this->getUrl('specialprice/adminhtml_specialprice/selsplprice');?>" />
+			<input type="hidden" name="special_price_url_del" id="special_price_url_del" value="<?php echo $this->getUrl('specialprice/adminhtml_specialprice/delsplprice');?>" />
+			<input type="hidden" name="special_price_url_sdel" id="special_price_url_sdel" value="<?php echo $this->getUrl('specialprice/adminhtml_specialprice/sdelsplprice');?>" />
+			<input type="hidden" name="update_sp_id" id="update_sp_id" value="" />
+			
+			<div id="add_special_price_head">
+				<a href="javascript:" onclick="special_price_popup();">
+					<?php echo $this->__('Add Special Price');?>
+				</a>
+			</div>
+			
+			<p>&nbsp;</p><p>&nbsp;</p>
+			
+			<table width="90%" id="special_price_list" class="gridtable">
+
+				<tr>
+					<!-- <th><?php echo $this->__('ID');?></th> -->
+					<th><?php echo $this->__('Special Price From Date');?></th>
+					<th><?php echo $this->__('Special Price To Date');?></th>
+					<th><?php echo $this->__('Special Price');?></th>
+					<th><?php echo $this->__('Action');?></th>
+				</tr>
+				
+			<?php
+			$special_price_dates = $this->getSpecialPriceList($current_product_id);
+			$new_tr = "";
+			foreach($special_price_dates as $key=>$special_price_date)
+			{
+				$new_tr .= "<tr id=special_price_list_row".$special_price_date['id'].">";
+				//$new_tr .= "<td>" .$special_price_date['id']."</td>";
+				$new_tr .= "<td>" . date('d-m-Y', strtotime($special_price_date['special_price_from_date'])) ."</td>";
+				$new_tr .= "<td>" . date('d-m-Y', strtotime($special_price_date['special_price_to_date'])) ."</td>";
+				$new_tr .= "<td>" . substr($special_price_date['special_price'], 0, -2) ."</td>";
+				$new_tr .= "<td>
+							<a href='javascript:' onclick='return retrieve_special_price(".$special_price_date['id'].");'> Edit   </a> &nbsp;&nbsp;&nbsp; 
+							<a href='javascript:' onclick='return delete_special_price(".$special_price_date['id'].");'> Delete </a> </td>";
+				$new_tr .= "</tr>";
+			}
+			if($new_tr == "")
+				$new_tr = "<tr id='no_data_special_price'><td colspan='4'>No Record Found</td></tr>";
+			//** Print the rows
+			echo $new_tr;
+			?>
+			</table>		
+		</div>
+	</div>
+
+
+<div id="message-popup-window-mask" style="height: 1161px;"></div>
+<div id="message-popup-window" class="message-popup show">
+    <div class="message-popup-head">
+        <a href="#" onclick="closeMessagePopup(); return false;" title="close">
+			<span><?php echo $this->__('close');?></span>
+		</a>
+        <h2><?php echo $this->__('Special Price');?></h2>
+    </div>
+	
+    <div class="message-popup-content">
+        <div class="message">
+		
+<table cellspacing="0" class="form-list">
+<tr>
+	<td class="label">
+		<label for="vj_product_name"><?php echo $this->__('Product Name'); ?><span class="required">*</span></label>
+	</td>
+	<td class="value">
+		<input class="input-text" type="text" name="vj_product_name" id="vj_product_name" readonly disabled /> 
+	</td>
+	<td class="scope-label"><span class="nobr"></span></td>
+</tr>
+
+<tr>
+	<td class="label">
+		<label for="vj_price"><?php echo $this->__('Current Price'); ?><span class="required">*</span></label>
+	</td>
+	<td class="value">
+		<input class="input-text" type="text" name="vj_price" id="vj_price" readonly disabled /> 
+	</td>
+	<td class="scope-label"><span class="nobr"></span></td>
+</tr>
+
+<tr>
+	<td class="label">
+		<label for="vj_special_price"><?php echo $this->__('Special Price'); ?><span class="required">*</span></label>
+	</td>
+	<td class="value">
+		<input class="input-text " type="text" name="vj_special_price" id="vj_special_price" onkeypress="return isNumberKey(event, this)" maxlength="8" autocomplete="off" /> 
+		
+		<div style="display:none" id="sp1_require" class="validation-advice">
+			<?php echo $this->__('This is a required field');?>
+		</div>
+	</td>
+	<td class="scope-label"><span class="nobr"></span></td>
+</tr>
+
+<tr>
+	<td class="label">
+		<label for="vj_special_price_from_date">
+			<?php echo $this->__('Special Price From Date'); ?><span class="required">*</span>
+		</label>
+	</td>
+	<td class="value">
+		<input class="input-text" type="text" name="vj_special_price_from_date" id="vj_special_price_from_date" readonly value=''  style='width:110px !important;' />
+		<span onclick="display_calender(1);" >
+			<img title='Select date' id='vj_special_price_from_date_trig' src='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/images/grid-cal.gif'; ?>' />
+		</span>
+		
+		<div style="display:none" id="sp2_require" class="validation-advice">
+			<?php echo $this->__('This is a required field');?>
+		</div>
+		<div style="display:none" id="sp4_require" class="validation-advice">
+			<?php echo $this->__('The From Date value should be less than or equal to the To Date value');?>
+		</div>
+		<div style="display:none" id="sp5_require" class="validation-advice">
+			<?php echo $this->__('Already this dates are available');?>
+		</div>
+	</td>
+	<td class="scope-label"><span class="nobr"></span></td>
+</tr>
+
+
+<tr>
+	<td class="label">
+		<label for="vj_special_price_to_date">
+			<?php echo $this->__('Special Price To Date'); ?><span class="required">*</span>
+		</label>
+	</td>
+	<td class="value">
+		<input class="input-text" type="text" name="vj_special_price_to_date" id="vj_special_price_to_date" readonly value='' style='width:110px !important;'  />	
+		<span onclick="display_calender(2);" >
+			<img title='Select date' id='vj_special_price_to_date_trig' src='<?php echo Mage::getBaseUrl(Mage_Core_Model_Store::URL_TYPE_SKIN) . 'adminhtml/default/default/images/grid-cal.gif'; ?>' />
+		</span>
+		<div style="display:none" id="sp3_require" class="validation-advice">
+			<?php echo $this->__('This is a required field');?>
+		</div>		
+	</td>
+	<td class="scope-label"><span class="nobr"></span></td>
+</tr>
+
+<tr>
+<td class="label">&nbsp;&nbsp;</td>
+<td class="value">
+	<button class="scalable save" type="button" title="Save" id="sp_save" name="sp_save" onclick="return  save_special_price();" >
+		<span><span><span><?php echo $this->__('Save');?></span></span></span>
+	</button>
+	&nbsp;&nbsp;&nbsp;
+	<button class="scalable save" type="button" title="Update" id="sp_update" name="sp_update" style="display:none;" onclick="return update_special_price();">
+		<span><span><span><?php echo $this->__('Update');?></span></span></span>
+	</button>
+</td>
+<td class="scope-label"><span class="nobr"></span></td>
+</tr>
+</table>
+			
+			
+			
+        </div>		
+        <!-- <p class="read-more"><a href="javascript:"></a></p> -->
+    </div>
+</div>
+
+
+
+<script type="text/javascript">
+//<![CDATA[
+	
+	//** Popup box
+	$('message-popup-window').setStyle({width: 'auto'});
+	$('vj_price').value = $('price').value;
+	$('vj_product_name').value = $('name').value;
+    var messagePopupClosed = false;
+	
+    function special_price_popup() {
+		reset_popup_value();
+        var height = $('html-body').getHeight();
+        $('message-popup-window-mask').setStyle({'height':height+'px'});
+        toggleSelectsUnderBlock($('message-popup-window-mask'), false);
+        Element.show('message-popup-window-mask');
+        $('message-popup-window').addClassName('show');
+    }
+
+    function closeMessagePopup() {
+        toggleSelectsUnderBlock($('message-popup-window-mask'), true);
+        Element.hide('message-popup-window-mask');
+        $('message-popup-window').removeClassName('show');
+        messagePopupClosed = true;
+		$("loading-mask").hide();
+    }
+
+    Event.observe(window, 'load', closeMessagePopup);
+	
+    Event.observe(window, 'keyup', function(evt) {
+        if(messagePopupClosed) return;
+        var code;
+        if (evt.keyCode) code = evt.keyCode;
+        else if (evt.which) code = evt.which;
+        if (code == Event.KEY_ESC) {
+            closeMessagePopup();
+        }
+    });
+	
+	//** Date-picker calling
+	Calendar.setup({
+		inputField: "vj_special_price_from_date",
+		ifFormat: "%d-%m-%Y",
+		showsTime: false,
+		button: "vj_special_price_from_date_trig",
+		align: "Bl",
+		singleClick : true
+	});
+
+	//** Date-picker calling
+	Calendar.setup({
+		inputField: "vj_special_price_to_date",
+		ifFormat: "%d-%m-%Y",
+		showsTime: false,
+		button: "vj_special_price_to_date_trig",
+		align: "Bl",
+		singleClick : true
+	});
+
+//]]>
+</script>
+
+</div>

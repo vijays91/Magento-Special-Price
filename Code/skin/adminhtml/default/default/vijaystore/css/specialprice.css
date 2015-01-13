@@ -1,0 +1,6 @@
+#special_price_list {font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;font-size: 12px;text-align: left;border-collapse: collapse;margin: 20px;}
+#special_price_list th {font-size: 14px;font-weight: normal;color: #039;padding: 12px 15px;}
+#special_price_list td {color: #669;border-top: 1px solid #e8edff;padding: 10px 15px;}
+#special_price_list tr:hover td {color: #339;background: #eff2ff;}
+#add_special_price_head a{color: #003399;}
+#add_special_price_head {background-color:#CFD2E1;float: right;font-family: "Lucida Sans Unicode","Lucida Grande",Sans-Serif;font-size: 14px;font-weight: normal;padding: 12px 15px;}

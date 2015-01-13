@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<layout>
+    <adminhtml_catalog_product_edit>	
+		<reference name="head">  
+			<action method="addItem" ifconfig="specialprice_tab/specialprice_setting/specialprice_active">
+				<type>skin_css</type><name>vijaystore/css/specialprice.css</name><params/>
+			</action>
+			<action method="addItem" ifconfig="specialprice_tab/specialprice_setting/specialprice_active">
+				<type>skin_js</type><name>vijaystore/js/specialprice.js</name><params/>
+			</action>
+		 </reference>
+		 
+        <reference name="product_tabs">
+            <action method="addTab" ifconfig="specialprice_tab/specialprice_setting/specialprice_active">
+                <name>specialprice_setting_tab</name>
+                <block>specialprice/adminhtml_catalog_product_tab</block>
+            </action>
+        </reference>
+    </adminhtml_catalog_product_edit>
+</layout>
+
